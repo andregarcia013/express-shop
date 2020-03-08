@@ -2,10 +2,10 @@ import Router from "../app/core/Router";
 import {UserController} from "../app/http/controllers/UserController";
 
 
-export class WebRouter extends Router {
+export class ApiRouter extends Router {
     constructor() {
         super();
-        this.defaultPath = '/';
+        this.defaultPath = '/api';
         this.get("/", new UserController().welcome,  ["basic"] );
     }
 }

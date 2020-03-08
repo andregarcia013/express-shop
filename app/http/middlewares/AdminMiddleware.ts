@@ -1,5 +1,9 @@
-import {Middleware} from "../../core/Middleware";
+import next from 'express';
 
-export class AdminMiddleware extends Middleware{
+export class AdminMiddleware {
 
+    handle(){
+
+        next();
+    }
 }
