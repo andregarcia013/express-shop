@@ -1,9 +1,8 @@
-import next from 'express';
 
 export class AdminMiddleware {
 
-    handle(){
+    async handle(request: any, response: any, next: any){
 
-        next();
+        next()
     }
 }

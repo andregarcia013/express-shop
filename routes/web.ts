@@ -6,6 +6,6 @@ export class WebRouter extends Router {
     constructor() {
         super();
         this.defaultPath = '/';
-        this.get("/", new UserController().welcome,  ["basic"] );
+        this.get("/", new UserController().welcome,  ["admin"] );
     }
 }
