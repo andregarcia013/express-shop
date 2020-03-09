@@ -28,6 +28,7 @@ export default class App {
         this.app.set('view engine', 'pug');
         this.app.use(express.json());
         this.app.use(express.urlencoded({extended: false}));
+        this.app.use(express.static(path.join(__dirname, '/../../public')));
 
         this.generateRoutes(routes);
         const PORT = process.env.PORT || 3000;
