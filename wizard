@@ -1,0 +1,175 @@
+const _ = require('lodash');
+const fs = require('fs');
+const path = require('path');
+const { exec } = require('child_process');
+const stringSimilarity = require('string-similarity');
+
+let files = {
+              getCurrentDirectoryBase: () => {
+                return path.basename(process.cwd());
+              },
+              directoryExists: (filePath) => {
+                return fs.existsSync(filePath);
+              },
+              createComponent: (targetName, componentName) =>{
+
+                let dir = process.cwd();
+                let middlePath = "/http/controllers";
+                let fileFill;
+
+
+
+                switch(targetName)
+                {
+                  case 'Controller':
+                    middlePath = "/http/controllers";
+                    componentName = componentName  + "Controller";
+                    fileFill = `
+import {Controller} from "../../core/Controller";
+
+export class ${componentName}Controller extends Controller{
+
+}`;
+                    break;
+                  case 'Middleware':
+                    middlePath = "/http/middlewares";
+                    componentName = componentName  + "Middleware";
+                    fileFill = `
+
+export class ${componentName}{
+
+}`;
+                    break;
+                  case 'Model':
+                    middlePath = "/emtities";
+                    fileFill = `
+import {Entity} from "typeorm";
+
+@Entity()
+export class ${componentName} {
+
+}`;
+                    break;
+                }
+
+                if( fs.existsSync(`${dir}/app${middlePath}/${componentName}.ts`)){
+                  console.log(`${componentName} already exists.`);
+                  return true;
+                }
+
+
+                  fs.writeFile(`${dir}/app${middlePath}/${componentName}.ts`, fileFill, function(err) {
+                      if(err) {
+                          return console.log(err);
+                      }
+                      console.log(`${componentName} created with success.`);
+                      return true;
+                  });
+
+              },
+              createModel: (modelName) =>{
+                let dir = path.basename(process.cwd());
+                fs.writeFile(`${dir}/models/${modelName}.js`, `
+
+                import
+
+                `, function(err) {
+                    if(err) {
+                        return console.log(err);
+                    }
+                    console.log(`Model ${modelName} created with success.`);
+                    return true;
+                });
+              },
+              createProject: (projectName) =>{
+                 exec(`git clone ${gitRepo} ${projectName}`, (err, stdout, stderr) => {
+                  if (err) {
+                    console.error(err)
+                  } else {
+                    exec(`cd ${projectName} && npm install `, (err, stdout, stderr) => {
+                      if (err) {
+                        console.error(err)
+                      } else {
+
+                      }
+                    });
+                  }
+                });
+              }
+};
+
+var myArgs = process.argv.splice(2);
+let error = false;
+
+
+let actions = [
+    'create',
+    'make',
+];
+
+let targets = [
+    'model',
+    'component',
+    'service',
+    'provider',
+    'task',
+    'action',
+    'reducer',
+];
+
+let templates = [
+    'react',
+    'angular',
+    'vue'
+];
+
+
+let action =  myArgs[0].split(':');
+
+
+if(!action[0]){
+    console.log('Please enter a command!');
+    return 0;
+}
+
+/**
+ *  @description Get the module target to create a new Object
+ */
+const getGenerateTarget = function () {
+    let target = action[1];
+    targets.map((e) => {
+        let porcentage = stringSimilarity.compareTwoStrings(e, myArgs[0]);
+        if( porcentage > 0.65 && porcentage < 1){
+            console.log(`Target ${action} not found \nDid you mean '${e}'?`);
+            error = true;
+        }
+    });
+
+    if(!error)
+    {
+      return action[1];
+    }
+};
+
+
+const getTemplateTarget = function () {
+    let target = myArgs[1];
+    targets.map((e) => {
+        let porcentage = stringSimilarity.compareTwoStrings(e, myArgs[0]);
+        if( porcentage > 0.65){
+            console.log(`Command ${action} not found \nDid you mean '${e}'?`);
+        }
+        return '';
+    });
+};
+
+
+let target = _.capitalize(getGenerateTarget());
+let componentName  =  _.capitalize(myArgs[1]);
+
+switch(action[0]){
+    case 'create':
+        files.createProject();
+    case 'make':
+        files.createComponent(target, componentName)
+}
